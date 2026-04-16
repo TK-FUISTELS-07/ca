@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor - TK-OCEAN</title>
+    <!-- SECURITY: Validación de token obligatoria -->
+    <script src="../../security.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../styles/style-home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --green-primary: #10D68A;
+            --green-dark: #0ea876;
+            --green-glow: rgba(16, 214, 138, 0.3);
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .ambient-light {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(16, 214, 138, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .player-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: #000;
+            z-index: 1;
+        }
+        
+        .disney-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+        
+        .disney-header.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        
+        .disney-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--green-primary);
+            text-shadow: 0 0 30px var(--green-glow);
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(16, 214, 138, 0.3);
+            border-top-color: var(--green-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-screen {
+            position: absolute;
+            inset: 0;
+            background: #0a0a0a;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 2rem;
+        }
+        
+        .error-screen.active {
+            display: flex;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+        
+        #video-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Overlay transparente para capturar eventos del mouse sobre iframe */
+        .mouse-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* Hotspot superior para mostrar header */
+        .mouse-overlay .hotspot-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            pointer-events: auto;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 1.5rem 2rem;
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .btn-control {
+            background: rgba(16, 214, 138, 0.2);
+            border: 1px solid rgba(16, 214, 138, 0.3);
+            color: var(--green-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-control:hover {
+            background: var(--green-primary);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--green-glow);
+        }
+        
+        .btn-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .source-indicator {
+            position: fixed;
+            bottom: 1rem;
+            left: 2rem;
+            background: rgba(16, 214, 138, 0.2);
+            color: var(--green-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 214, 138, 0.3);
+            z-index: 500;
+        }
+        
+        /* Header con título de película y botón volver */
+        .header-movie-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60vw;
+        }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-back:hover {
+            background: var(--green-primary);
+            border-color: var(--green-primary);
+            color: #000;
+        }
+
+        /* Debug Panel - OCULTO */
+        .debug-panel {
+            display: none !important;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 400px;
+            max-height: 70vh;
+            background: rgba(10,15,10,0.95);
+            border: 1px solid rgba(16,214,138,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 9999;
+            display: none;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        /* .debug-panel.active { display: block; } */
+        .debug-panel h4 {
+            color: var(--green-primary);
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .debug-panel pre {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 6px;
+            color: #7ee787;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .btn-debug {
+            display: none !important;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+            background: rgba(16,214,138,0.2);
+            border: 1px solid rgba(16,214,138,0.4);
+            color: var(--green-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .btn-debug:hover {
+            background: rgba(16,214,138,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-light"></div>
+
+    <!-- Overlay para detectar movimiento del mouse sobre iframe -->
+    <div class="mouse-overlay" id="mouseOverlay">
+        <div class="hotspot-top"></div>
+    </div>
+    
+    <!-- Header con título de película y botón volver -->
+    <header class="disney-header" id="header">
+        <button class="btn-back" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver</span>
+        </button>
+        <span class="header-movie-title" id="movie-title">Cargando...</span>
+        <div style="width: 80px;"></div> <!-- Spacer para balancear -->
+    </header>
+
+    <!-- Botón Debug -->
+    <button class="btn-debug" onclick="toggleDebugPanel()" title="Ver JSON">Ver JSON</button>
+
+    <!-- Panel Debug -->
+    <div class="debug-panel" id="debugPanel">
+        <h4>Datos Player <button onclick="toggleDebugPanel()" style="background:none;border:none;color:#fff;cursor:pointer;">×</button></h4>
+        <pre id="debugContent">Cargando...</pre>
+    </div>
+
+    <!-- Contenedor del reproductor -->
+    <div class="player-container">
+        <!-- Loading -->
+        <div class="loading-overlay" id="loader">
+            <div class="spinner"></div>
+            <p class="text-green-400 mt-4 animate-pulse">Cargando a través de Proxy Local...</p>
+        </div>
+        
+        <!-- Pantalla de error -->
+        <div class="error-screen" id="error">
+            <i class="fas fa-exclamation-triangle error-icon"></i>
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Error al cargar el video</h2>
+            <p style="color: #a3a3a3; margin-bottom: 2rem;">Esta fuente no está disponible. Intenta con otra.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-control" onclick="retryCurrent()">
+                    <i class="fas fa-redo"></i> Reintentar
+                </button>
+                <button class="btn-control" id="btn-error-next" onclick="nextSource()" style="display: none;">
+                    <i class="fas fa-forward"></i> Siguiente fuente
+                </button>
+            </div>
+        </div>
+        
+        <!-- Iframe del video (carga el proxy) -->
+        <iframe id="video-frame" allowfullscreen scrolling="no" allow="autoplay; fullscreen; picture-in-picture"></iframe>
+
+    <script src="./player.js"></script>
+    <script>
+        // Mostrar título de la película en el header
+        (function() {
+            const movieData = JSON.parse(
+                localStorage.getItem('ocean_current_pelicula') || 
+                localStorage.getItem('ocean_current_movie') || 
+                '{}'
+            );
+            const titleElement = document.getElementById('movie-title');
+            if (movieData.title && titleElement) {
+                titleElement.textContent = movieData.title;
+                document.title = movieData.title + ' - Nucleo-G';
+            }
+        })();
+    </script>
+</body>
+</html>
