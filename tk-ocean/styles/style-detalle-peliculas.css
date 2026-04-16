@@ -1,0 +1,601 @@
+:root {
+    --nova-accent: #00ffcc;
+    --nova-accent-rgb: 0, 255, 204;
+    --hero-bg-dark: #050505;
+    --text-shadow: 0 4px 15px rgba(0, 0, 0, 1);
+    --poster-w-sm: 220px;
+    --poster-w-md: 320px;
+    --poster-w-lg: 380px;
+    --poster-w-xl: 420px;
+    --transition-base: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000 !important;
+}
+
+#movie-structure,
+#serie-structure {
+    display: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: var(--nova-accent);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(var(--nova-accent-rgb), 0.3);
+}
+
+/* ============================================================
+   BOTONES PREMIUM (DETALLE PELÍCULAS)
+   ============================================================ */
+
+/* Contenedor de botones: Forzar horizontalidad */
+.flex.flex-row.items-center.justify-center.md\:justify-start.gap-6 {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    /* Evita que el segundo botón baje en móviles */
+    align-items: center;
+    width: 100%;
+}
+
+/* Estilos Base para ambos botones */
+.btn-premium {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 180px;
+    text-transform: uppercase;
+    white-space: nowrap !important;
+    /* Evita que el texto se rompa en dos líneas */
+}
+
+/* Capa de contenido para estar por encima del brillo */
+.btn-content {
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+}
+
+/* Botón Principal (Blanco) */
+.btn-primary {
+    background: white;
+    color: black;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+    background: var(--nova-accent, #3b82f6);
+    color: white;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* Botón Secundario (Glassmorphism) */
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--nova-accent, #3b82f6);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto de Brillo (Shine Animation) */
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent);
+    transition: all 0.6s ease;
+    z-index: 1;
+}
+
+.btn-premium:hover .btn-shine {
+    left: 100%;
+}
+
+/* Click effect */
+.btn-premium:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Ajustes para móviles (Pantallas pequeñas) */
+@media (max-width: 640px) {
+    .flex.flex-row.items-center.justify-center.md\:justify-start.gap-6 {
+        gap: 12px;
+        /* Reducimos el espacio entre botones en móvil */
+    }
+
+    .btn-premium {
+        min-width: 140px;
+        /* Un poco más pequeños en móvil */
+        padding: 12px 20px;
+        font-size: 0.75rem;
+    }
+
+    .btn-premium i {
+        margin-right: 6px !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .btn-premium {
+        min-width: 120px;
+        padding: 10px 15px;
+    }
+}
+
+#detail-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    display: block !important;
+    position: relative;
+    z-index: 20;
+    background-color: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    filter: none !important;
+}
+
+#poster-container {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    overflow: visible !important;
+}
+
+#hero-backdrop {
+    display: flex;
+    align-items: center;
+    min-height: 80vh;
+    position: relative;
+    overflow: hidden;
+
+    /* Efecto de desenfoque (opcional, muy moderno) */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* 1. Asegurar que el fondo NO bloquee los clics */
+.global-background-container,
+#backdrop-img,
+#hero-backdrop::after,
+.absolute.inset-0 {
+    pointer-events: none;
+    /* Esto permite que el clic "atraviese" la capa hacia los botones */
+}
+
+/* 2. Forzar que el contenido principal esté por encima de todo */
+.content-wrapper {
+    position: relative;
+    z-index: 20;
+    /* Valor alto para estar sobre el fondo */
+}
+
+/* 3. Asegurar que los botones sean clickeables específicamente */
+.btn-premium,
+#btn-play-main,
+#btn-list-toggle {
+    position: relative;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+    /* Fuerza la interacción */
+}
+
+/* 4. Ajuste para el header si se quedó bloqueado */
+.main-header {
+    z-index: 1000 !important;
+}
+
+/* Corrección de tu ID específico según la captura */
+#hero-backdrop {
+    /* Si el hero tiene un fondo que bloquea, lo quitamos */
+    background: transparent !important;
+    pointer-events: none;
+    /* El section no debe atrapar clics... */
+}
+
+#hero-backdrop>div {
+    pointer-events: auto;
+    /* ...pero su contenido interno (el div con los botones) SÍ */
+}
+
+#backdrop-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(4px);
+    opacity: 0.35;
+    transform: scale(1.1);
+    z-index: 0;
+}
+
+#hero-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #000 -10%, transparent 10%, #000 150%);
+    z-index: 1;
+}
+
+
+
+.flex-col.md\:flex-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+}
+
+@media (min-width: 768px) {
+    .flex-col.md\:flex-row {
+        flex-direction: row;
+        align-items: flex-end;
+        text-align: left;
+    }
+}
+
+#poster-container::after {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    background: var(--nova-accent);
+    filter: blur(70px);
+    opacity: 0.15;
+    z-index: -1;
+    border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+    #poster-container {
+        width: var(--poster-w-md);
+    }
+}
+
+@media (min-width: 1024px) {
+    #poster-container {
+        width: var(--poster-w-lg);
+    }
+}
+
+#detail-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#poster-container:hover {
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: 0 30px 60px rgba(var(--nova-accent-rgb), 0.3);
+    background: rgba(var(--nova-accent-rgb), 0.4);
+}
+
+#detail-title {
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 0.9;
+    font-weight: 950;
+    text-transform: uppercase;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to bottom, #fff 40%, var(--nova-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+#detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+#detail-meta .nova-card {
+    background: rgba(var(--nova-accent-rgb), 0.1);
+    border: 1px solid rgba(var(--nova-accent-rgb), 0.3);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+}
+
+#detail-description {
+    font-size: clamp(1.1rem, 1.3vw, 1.25rem);
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 800px;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#btn-play-main {
+    background-color: #fff;
+    color: #000 !important;
+    padding: 18px 45px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    transition: var(--transition-base);
+    border: none;
+    cursor: pointer;
+}
+
+#btn-play-main:hover {
+    background-color: var(--nova-accent);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(var(--nova-accent-rgb), 0.4);
+}
+
+#btn-list-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 18px 35px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    transition: var(--transition-base);
+}
+
+#btn-list-toggle:hover {
+    background: rgba(var(--nova-accent-rgb), 0.2);
+    border-color: var(--nova-accent);
+}
+
+
+#similar-container .nova-card {
+    background: rgba(0, 0, 0, 0.482);
+    border-radius: 0rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+}
+
+#similar-container h3 {
+    font-size: 2rem;
+    font-style: italic;
+    font-weight: 900;
+    color: var(--nova-accent);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+}
+
+#similar-container .grid {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 2rem;
+    scroll-padding: 2rem;
+}
+
+#similar-container .group {
+    flex: 0 0 200px;
+    transition: var(--transition-base);
+}
+
+#similar-container .relative.aspect-\[2\/3\] {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: var(--transition-base);
+}
+
+#similar-container .group:hover {
+    transform: translateY(-10px);
+}
+
+#similar-container .group:hover .relative.aspect-\[2\/3\] {
+    border-color: var(--nova-accent);
+    box-shadow: 0 10px 30px rgba(var(--nova-accent-rgb), 0.3);
+}
+
+#similar-container h4 {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+    color: #ccc;
+    transition: color 0.3s ease;
+}
+
+#similar-container .group:hover h4 {
+    color: var(--nova-accent);
+}
+
+#movie-structure h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    border-left: 6px solid var(--nova-accent);
+    padding-left: 20px;
+    text-transform: uppercase;
+    font-style: italic;
+}
+
+#player-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 2rem;
+    background: #000;
+    box-shadow: 0 0 50px rgba(var(--nova-accent-rgb), 0.1);
+}
+
+#player-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#loading-detail {
+    background: #000;
+    transition: opacity 0.5s ease;
+}
+
+#main-content {
+    transition: opacity 0.8s ease;
+}
+
+.animate-spin {
+    border-top-color: var(--nova-accent) !important;
+}
+
+@keyframes heroReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+#detail-title,
+#detail-meta,
+#detail-description,
+.flex-wrap {
+    animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+#detail-title {
+    animation-delay: 0.2s;
+}
+
+#detail-description {
+    animation-delay: 0.3s;
+}
+
+@media (max-width: 768px) {
+    #hero-backdrop {
+        padding-top: 120px;
+        min-height: auto;
+    }
+
+    #detail-title {
+        text-align: center;
+    }
+
+    #detail-meta {
+        justify-content: center;
+    }
+
+    #detail-description {
+        text-align: center;
+    }
+
+    .flex-wrap {
+        justify-content: center;
+    }
+
+    #similar-container .group {
+        flex: 0 0 160px;
+    }
+}
+
+#nav-buttons-container {
+    display: none !important;
+}
+
+/* Ocultar el texto "Analizando Recursos" */
+#loading-detail p.text-nova-accent {
+    display: none !important;
+}
+
+/* Contenedor del texto de recomendación */
+.recommendation-box {
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--nova-accent);
+    /* Línea de acento lateral */
+    border-radius: 8px;
+    font-size: 0.875rem;
+    /* text-sm */
+    color: #94a3b8;
+    /* text-gray-400 mejorado para legibilidad */
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Estilo específico para el enlace (Etiqueta <a>) */
+.recommendation-box a {
+    color: var(--nova-accent);
+    font-weight: 700;
+    text-decoration: none;
+    position: relative;
+    padding: 2px 4px;
+    transition: all 0.3s ease;
+    background: rgba(59, 130, 246, 0.1);
+    /* Fondo muy tenue */
+    border-radius: 4px;
+}
+
+/* Efecto hover animado para el enlace */
+.recommendation-box a:hover {
+    color: #ffffff;
+    background: var(--nova-accent);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Icono opcional si quieres agregarlo por HTML */
+.recommendation-box i {
+    color: var(--nova-accent);
+    font-size: 1.1rem;
+}
+
