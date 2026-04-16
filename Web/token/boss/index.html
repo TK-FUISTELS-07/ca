@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión 3: Boss Battle | TK-OCEAN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a0000, #330000, #1a0a0a);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #ff3366;
+            text-shadow: 0 0 20px #ff3366;
+            margin-bottom: 10px;
+        }
+        
+        /* BOSS HP BAR */
+        .boss-hp-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            border: 2px solid #ff3366;
+        }
+        .boss-name {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        .hp-bar-bg {
+            width: 100%;
+            height: 40px;
+            background: #330000;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #ff0000;
+        }
+        .hp-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+        }
+        .hp-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* BANNER 468x60 SOBRE BOSS */
+        .ad-boss-banner {
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+            min-height: 60px;
+        }
+        
+        /* BOSS AREA */
+        .boss-arena {
+            position: relative;
+            width: 500px;
+            height: 400px;
+            margin: 30px auto;
+            background: radial-gradient(ellipse at center, rgba(255, 51, 102, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* BOSS CHARACTER */
+        .boss-character {
+            font-size: 12rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            filter: drop-shadow(0 0 30px #ff3366);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .boss-character:active {
+            transform: scale(0.9);
+        }
+        .boss-character.hit {
+            animation: shake 0.3s ease-in-out;
+            filter: drop-shadow(0 0 50px #ff0000);
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
+        }
+        
+        /* DAMAGE NUMBER */
+        .damage-popup {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ff0000;
+            animation: damageFloat 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes damageFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+        
+        /* HIT COUNTER */
+        .hit-counter {
+            text-align: center;
+            margin: 20px;
+            font-size: 1.3rem;
+        }
+        .hit-counter span {
+            color: #ff3366;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        /* INSTRUCTIONS */
+        .instructions {
+            text-align: center;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid #ff3366;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        .instructions h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        /* BOTÓN VOLVER */
+        .back-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #ff3366;
+            color: #ff3366;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #ff3366;
+            color: #fff;
+        }
+        
+        /* MODAL VICTORIA */
+        .victory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .victory-modal.active {
+            display: flex;
+        }
+        .victory-modal i {
+            font-size: 5rem;
+            color: #00ff88;
+            margin-bottom: 20px;
+            animation: victoryPulse 0.5s infinite;
+        }
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .victory-modal h2 {
+            font-size: 2.5rem;
+            color: #00ff88;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ff88;
+        }
+        
+        /* SMARTLINK BONUS MSG */
+        .bonus-msg {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+        .bonus-msg.active {
+            display: block;
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            .boss-arena { width: 350px; height: 300px; }
+            .boss-character { font-size: 8rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- POPUNDER -->
+    <script src="https://chewsever.com/a5/85/ae/a585ae93afa1a1f4fb015a12a3854d44.js"></script>
+    
+    <!-- SOCIAL BAR -->
+    <script src="https://pl29162395.profitablecpmratenetwork.com/b0/f0/a4/b0f0a465b1c66ee1c469e876f6871721.js"></script>
+    
+    <div class="header">
+        <h1><i class="fas fa-dragon"></i> Guardián del Servidor</h1>
+        <p>Golpea al villano 5 veces para derrotarlo y obtener acceso</p>
+    </div>
+    
+    <!-- BOSS HP BAR -->
+    <div class="boss-hp-container">
+        <div class="boss-name"><i class="fas fa-skull"></i> FIREWALL DEMON</div>
+        <div class="hp-bar-bg">
+            <div class="hp-bar-fill" id="hpBar"><span id="hpText">100%</span></div>
+        </div>
+        <p class="hp-text">HP: <span id="hpValue">100</span> / 100</p>
+    </div>
+    
+    <!-- BANNER 468x60 -->
+    <div class="ad-boss-banner">
+        <script>
+            atOptions = {
+                'key' : '5a5bbb19ff5df4b1b0ff6409ee320c10',
+                'format' : 'iframe',
+                'height' : 60,
+                'width' : 468,
+                'params' : {}
+            };
+        </script>
+        <script src="https://chewsever.com/5a5bbb19ff5df4b1b0ff6409ee320c10/invoke.js"></script>
+    </div>
+    
+    <div class="hit-counter">
+        GOLPES: <span id="hitCount">0</span> / 5
+    </div>
+    
+    <div class="boss-arena" id="bossArena">
+        <div class="boss-character" id="bossChar" onclick="hitBoss(event)">👹</div>
+    </div>
+    
+    <div class="instructions">
+        <h3><i class="fas fa-hand-pointer"></i> Instrucciones</h3>
+        <p>Haz clic rápido en el demonio para golpearlo.</p>
+        <p style="color: #ffaa00; margin-top: 10px;"><i class="fas fa-bolt"></i> Golpes 1, 3 y 5 activan bonus de sincronización</p>
+    </div>
+    
+    <button class="back-btn" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver al Portal
+    </button>
+    
+    <!-- MODAL VICTORIA -->
+    <div class="victory-modal" id="victoryModal">
+        <i class="fas fa-trophy"></i>
+        <h2>¡JEFE DERROTADO!</h2>
+        <p style="margin-bottom: 30px; font-size: 1.2rem;">El Guardián ha caído. El acceso es tuyo.</p>
+        <button class="back-btn" onclick="claimVictory()" style="background: linear-gradient(135deg, #00ff88, #00d4ff); border: none; color: #000; font-weight: 700; font-size: 1.2rem;">
+            <i class="fas fa-ticket-alt"></i> RECLAMAR TOKEN
+        </button>
+    </div>
+    
+    <!-- BONUS MSG -->
+    <div class="bonus-msg" id="bonusMsg">
+        <i class="fas fa-bolt"></i> ¡Bonus de sincronización activado!
+    </div>
+    
+    <script>
+        let hitCount = 0;
+        let bossHP = 100;
+        const SMARTLINK_URL = 'https://www.profitablecpmratenetwork.com/fd92nnjkv?key=6932873a546891664b4dce617e72621d';
+        
+        function hitBoss(event) {
+            if (hitCount >= 5) return;
+            
+            hitCount++;
+            bossHP = Math.max(0, 100 - (hitCount * 20));
+            
+            // Animación de golpe
+            const boss = document.getElementById('bossChar');
+            boss.classList.add('hit');
+            setTimeout(() => boss.classList.remove('hit'), 300);
+            
+            // Mostrar daño
+            showDamage(event);
+            
+            // Actualizar HP
+            document.getElementById('hpBar').style.width = bossHP + '%';
+            document.getElementById('hpText').textContent = bossHP + '%';
+            document.getElementById('hpValue').textContent = bossHP;
+            document.getElementById('hitCount').textContent = hitCount;
+            
+            // Smartlink en golpes 1, 3 y 5
+            if (hitCount === 1 || hitCount === 3 || hitCount === 5) {
+                window.open(SMARTLINK_URL, '_blank');
+                showBonusMsg();
+            }
+            
+            // Verificar victoria
+            if (hitCount >= 5) {
+                boss.innerHTML = '💀';
+                setTimeout(() => {
+                    document.getElementById('victoryModal').classList.add('active');
+                }, 500);
+            }
+        }
+        
+        function showDamage(event) {
+            const arena = document.getElementById('bossArena');
+            const damage = document.createElement('div');
+            damage.className = 'damage-popup';
+            damage.textContent = '-20 HP';
+            damage.style.left = (event.offsetX || 200) + 'px';
+            damage.style.top = (event.offsetY || 150) + 'px';
+            arena.appendChild(damage);
+            setTimeout(() => damage.remove(), 1000);
+        }
+        
+        function showBonusMsg() {
+            const msg = document.getElementById('bonusMsg');
+            msg.classList.add('active');
+            setTimeout(() => msg.classList.remove('active'), 2000);
+        }
+        
+        function claimVictory() {
+            console.log('[BOSS] Completando misión 3...');
+            
+            // Abrir smartlink final
+            window.open(SMARTLINK_URL, '_blank');
+            
+            // Guardar datos de misión completada
+            const missionData = {
+                number: 3,
+                completed: true,
+                completedAt: Date.now()
+            };
+            localStorage.setItem('tk-current-mission', JSON.stringify(missionData));
+            localStorage.setItem('tk-mission-complete', 'true');
+            
+            console.log('[BOSS] Misión guardada:', missionData);
+            
+            // Redirigir al portal
+            window.location.href = '../index.html?mission=completed';
+        }
+        
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>
