@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capítulo - TK-OCEAN</title>
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+    <link rel="stylesheet" href="../../../styles/style-index.css">
+</head>
+<body class="bg-nova-bg text-nova-text font-nova">
+    
+    <!-- Header Navigation -->
+    <header class="main-header sticky top-0 z-[100] w-full">
+        <nav id="navbar" class="relative w-full border-b border-white/10 bg-black/50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex-shrink-0">
+                    <a href="./../../../index.html" class="group flex items-center">
+                        <div class="nova-card p-2 px-4 flex items-center relative overflow-hidden logo-container">
+                            <div class="absolute inset-0 bg-nova-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <i class="fas fa-film mr-3 text-nova-accent text-xl group-hover:rotate-12 transition-transform duration-300"></i>
+                            <span class="text-2xl font-black tracking-tighter logo-text">
+                                TK-<span class="text-nova-accent">OCEAN</span>
+                            </span>
+                            <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-nova-accent group-hover:w-full transition-all duration-500"></div>
+                        </div>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-2">
+                    <a href="./../../../index.html" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Inicio</a>
+                    <a href="./../../../peliculas/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Películas</a>
+                    <a href="./../../../series/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Series</a>
+                    <a href="./../../../animes/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Anime</a>
+                    <a href="./../../../dorama/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Doramas</a>
+                    <a href="./../../../genero/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Géneros</a>
+                    <a href="./../../../anos/" class="nova-card px-3 py-2 text-sm text-nova-text hover:text-nova-accent transition-colors">Años</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 container mx-auto px-6 py-8 flex-1">
+        <div id="loading" class="text-center py-20">
+            <div class="spinner"></div>
+            <p class="mt-4 text-gray-400">Cargando episodio...</p>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="./../../../config.js"></script>
+    <script src="./confi-capitulo.js"></script>
+    <script src="./efectos-styles.js"></script>
+</body>
+</html>
