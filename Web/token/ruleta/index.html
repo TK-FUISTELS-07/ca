@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión 1: Ruleta VIP | TK-OCEAN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .attempts-counter {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .attempts-counter span {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            max-width: 1000px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* RULETA */
+        .roulette-section {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .roulette-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        
+        .roulette-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #ffd700 0deg 60deg,
+                #ff6b6b 60deg 120deg,
+                #00d4ff 120deg 180deg,
+                #7b2cbf 180deg 240deg,
+                #00ff88 240deg 300deg,
+                #ffaa00 300deg 360deg
+            );
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        }
+        
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            border: 4px solid #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        .wheel-center i {
+            font-size: 2.5rem;
+            color: #ffd700;
+        }
+        
+        .wheel-segments span {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .seg-1 { top: 15%; left: 50%; transform: translateX(-50%); color: #000; }
+        .seg-2 { top: 35%; right: 15%; transform: rotate(60deg); }
+        .seg-3 { bottom: 35%; right: 15%; transform: rotate(120deg); }
+        .seg-4 { bottom: 15%; left: 50%; transform: translateX(-50%) rotate(180deg); }
+        .seg-5 { bottom: 35%; left: 15%; transform: rotate(240deg); }
+        .seg-6 { top: 35%; left: 15%; transform: rotate(300deg); }
+        
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff0000;
+            z-index: 20;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+        
+        /* BOTÓN GIRAR */
+        .spin-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .spin-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
+        }
+        .spin-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+        
+        /* RESULTADO */
+        .result-display {
+            text-align: center;
+            margin-top: 20px;
+            min-height: 60px;
+        }
+        .result-display h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .result-display p {
+            opacity: 0.8;
+        }
+        .win { color: #00ff88; }
+        .lose { color: #ff6b6b; }
+        .almost { color: #ffaa00; }
+        
+        /* ADS LATERAL 300x250 */
+        .ad-sidebar {
+            width: 300px;
+            height: 250px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        /* BOTÓN VOLVER */
+        .back-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+        
+        /* MODAL VICTORIA */
+        .victory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .victory-modal.active {
+            display: flex;
+        }
+        .victory-modal i {
+            font-size: 5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .victory-modal h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        .claim-btn {
+            padding: 20px 60px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            animation: glow 2s infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+        }
+        
+        /* SKELETON SCREEN */
+        .skeleton-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .skeleton-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .skeleton-roulette {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            margin-bottom: 30px;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-text {
+            width: 250px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        .loading-ad-placeholder {
+            width: 300px;
+            height: 250px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .ad-sidebar {
+                width: 100%;
+                max-width: 300px;
+            }
+            .roulette-container {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SKELETON LOADER -->
+    <div class="skeleton-loader" id="skeletonLoader">
+        <div class="skeleton-roulette"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text" style="width: 200px;"></div>
+        <div class="loading-ad-placeholder">
+            <span><i class="fas fa-spinner fa-spin"></i> Cargando recursos...</span>
+        </div>
+    </div>
+    
+    <!-- SOCIAL BAR (Pasivo) -->
+    <script src="https://pl29162395.profitablecpmratenetwork.com/b0/f0/a4/b0f0a465b1c66ee1c469e876f6871721.js"></script>
+    
+    <!-- POPUNDER - Solo se dispara en interacción, NO aquí -->
+    
+    <div class="header">
+        <h1><i class="fas fa-dice"></i> Ruleta VIP</h1>
+        <p>Gira la ruleta. ¡3 intentos para ganar acceso premium!</p>
+    </div>
+    
+    <div class="attempts-counter">
+        INTENTO <span id="currentAttempt">1</span> DE 3
+    </div>
+    
+    <div class="game-container">
+        <div class="roulette-section">
+            <div class="roulette-container">
+                <div class="pointer"></div>
+                <div class="roulette-wheel" id="rouletteWheel">
+                    <div class="wheel-center">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="wheel-segments">
+                        <span class="seg-1">VIP</span>
+                        <span class="seg-2">X</span>
+                        <span class="seg-3">?</span>
+                        <span class="seg-4">VIP</span>
+                        <span class="seg-5">X</span>
+                        <span class="seg-6">?</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="spin-btn" id="spinBtn" onclick="spinRoulette()">
+                <i class="fas fa-play"></i> GIRAR
+            </button>
+            
+            <div class="result-display" id="resultDisplay"></div>
+        </div>
+        
+        <!-- BANNER 300x250 -->
+        <div class="ad-sidebar">
+            <script>
+                atOptions = {
+                    'key' : 'd932d630aac9f79276d7b6f8ea06b30c',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://chewsever.com/d932d630aac9f79276d7b6f8ea06b30c/invoke.js"></script>
+        </div>
+    </div>
+    
+    <button class="back-btn" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver al Portal
+    </button>
+    
+    <!-- MODAL VICTORIA -->
+    <div class="victory-modal" id="victoryModal">
+        <i class="fas fa-crown"></i>
+        <h2>¡PREMIO VIP!</h2>
+        <p style="margin-bottom: 30px; font-size: 1.2rem;">Has ganado acceso premium a TK-OCEAN</p>
+        <button class="claim-btn" onclick="claimPrize()">
+            <i class="fas fa-ticket-alt"></i> RECLAMAR TOKEN
+        </button>
+    </div>
+    
+    <!-- SMARTLINK OCULTO -->
+    <iframe id="smartlinkFrame" style="width:1px;height:1px;position:absolute;left:-9999px;"></iframe>
+    
+    <script>
+        let currentAttempt = 1;
+        let isSpinning = false;
+        const SMARTLINK_URL = 'https://www.profitablecpmratenetwork.com/fd92nnjkv?key=6932873a546891664b4dce617e72621d';
+        
+        // SMARTLINK EN BACKGROUND
+        function openSmartlink() {
+            document.getElementById('smartlinkFrame').src = SMARTLINK_URL;
+            window.open(SMARTLINK_URL, '_blank');
+        }
+        
+        // OCULTAR SKELETON DESPUÉS DE "CARGAR"
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('skeletonLoader').classList.add('hidden');
+            }, 2000); // 2 segundos de "carga" para mostrar el anuncio
+        });
+        
+        function spinRoulette() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            const btn = document.getElementById('spinBtn');
+            const wheel = document.getElementById('rouletteWheel');
+            const result = document.getElementById('resultDisplay');
+            
+            btn.disabled = true;
+            result.innerHTML = '<p style="color: #00d4ff;"><i class="fas fa-spinner fa-spin"></i> La ruleta gira...</p>';
+            
+            // POPUNDER EN INTERACCIÓN - Solo se dispara al hacer clic en GIRAR
+            // Esto es indetectable porque el usuario está distraído con la animación
+            const popunderScript = document.createElement('script');
+            popunderScript.src = 'https://chewsever.com/a5/85/ae/a585ae93afa1a1f4fb015a12a3854d44.js';
+            document.body.appendChild(popunderScript);
+            
+            // Abrir smartlink en cada giro
+            openSmartlink();
+            
+            // Calcular resultado según intento
+            // Intento 1 y 2: Siempre "Casi" (no VIP)
+            // Intento 3: VIP garantizado
+            let rotation;
+            let outcome;
+            
+            if (currentAttempt === 1) {
+                // Casi VIP - cae cerca
+                rotation = 360 * 5 + 30; // 5 vueltas + casi VIP
+                outcome = 'almost';
+            } else if (currentAttempt === 2) {
+                // Casi de nuevo
+                rotation = 360 * 5 + 25;
+                outcome = 'almost2';
+            } else {
+                // Tercer intento - VIP!
+                rotation = 360 * 5; // Caer en VIP
+                outcome = 'win';
+            }
+            
+            wheel.style.transform = `rotate(${rotation}deg)`;
+            
+            setTimeout(() => {
+                isSpinning = false;
+                showResult(outcome);
+            }, 4000);
+        }
+        
+        function showResult(outcome) {
+            const result = document.getElementById('resultDisplay');
+            const btn = document.getElementById('spinBtn');
+            
+            if (outcome === 'win') {
+                // VICTORIA
+                setTimeout(() => {
+                    document.getElementById('victoryModal').classList.add('active');
+                }, 500);
+            } else if (outcome === 'almost') {
+                result.innerHTML = `
+                    <h2 class="almost"><i class="fas fa-exclamation-circle"></i> ¡CASI!</h2>
+                    <p>Caíste en zona VIP pero... ¡faltó poco! Intenta de nuevo.</p>
+                `;
+                currentAttempt++;
+                document.getElementById('currentAttempt').textContent = currentAttempt;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-redo"></i> INTENTAR DE NUEVO';
+            } else if (outcome === 'almost2') {
+                result.innerHTML = `
+                    <h2 class="almost"><i class="fas fa-exclamation-triangle"></i> ¡TAN CERCA!</h2>
+                    <p>¡Una vez más! El siguiente intento es el definitivo.</p>
+                `;
+                currentAttempt++;
+                document.getElementById('currentAttempt').textContent = currentAttempt;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-star"></i> ÚLTIMO INTENTO';
+            }
+        }
+        
+        function claimPrize() {
+            console.log('[RULETA] Reclamando premio VIP...');
+            
+            // Abrir otro smartlink
+            openSmartlink();
+            
+            // Marcar misión completada
+            // Asegurar que tenemos el número de misión (1 = Ruleta)
+            let missionData = JSON.parse(localStorage.getItem('tk-current-mission') || '{}');
+            missionData.number = 1; // Misión 1: Ruleta
+            missionData.completed = true;
+            missionData.won = true;
+            missionData.completedAt = Date.now();
+            
+            try {
+                localStorage.setItem('tk-current-mission', JSON.stringify(missionData));
+                localStorage.setItem('tk-mission-complete', 'true');
+                console.log('[RULETA] Misión 1 (Ruleta) marcada como completada');
+                console.log('[RULETA] Datos guardados:', missionData);
+            } catch (e) {
+                console.error('[RULETA] ERROR guardando misión:', e);
+            }
+            
+            // Redirigir al portal (el portal generará el token)
+            setTimeout(() => {
+                console.log('[RULETA] Redirigiendo al portal principal...');
+                window.location.href = '../index.html?mission=completed';
+            }, 1000);
+        }
+        
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+        
+        // RECARGA SILENCIOSA DE ANUNCIOS cada 30 segundos
+        setInterval(() => {
+            // Refrescar el banner 300x250 sin que el usuario lo note
+            const adSidebar = document.querySelector('.ad-sidebar');
+            if (adSidebar) {
+                const oldScript = adSidebar.querySelector('script[src*="invoke.js"]');
+                if (oldScript) {
+                    const newScript = document.createElement('script');
+                    newScript.src = oldScript.src;
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                }
+            }
+        }, 30000);
+        
+        // Verificar intento guardado
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('ruleta_attempt');
+            if (saved) {
+                currentAttempt = parseInt(saved);
+                document.getElementById('currentAttempt').textContent = currentAttempt;
+            }
+        });
+        
+        // Guardar intento
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('ruleta_attempt', currentAttempt);
+        });
+    </script>
+</body>
+</html>

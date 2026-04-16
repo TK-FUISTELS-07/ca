@@ -1,0 +1,202 @@
+/* Ocultar completamente la sección de reproductores en detalles */
+section:has(.fa-play.mr-3),
+section:has(.server-sidebar),
+section:has(#player-0),
+section:has(.player-content),
+section:has(.server-option),
+.server-sidebar,
+.player-content,
+.server-option,
+aside:has(.server-sidebar),
+[id^="player-"],
+[id^="server-option-"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    z-index: -9999 !important;
+}
+
+/* Ocultar cualquier sección que contenga "Reproductor" en el texto */
+section:has(h3:contains("Reproductor")),
+section:has(h2:contains("Reproductor")),
+section:has(h1:contains("Reproductor")) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Ocultar botones de servidores */
+.server-option,
+.play-button-ocean,
+button[id^="server-option-"] {
+    display: none !important;
+}
+
+/* ============================================
+   SECCIÓN SERIES SIMILARES
+   ============================================ */
+
+/* Quitar overlay de play en las cards de similares */
+.grid .movie-card .absolute.inset-0,
+.grid .movie-card .group-hover\:bg-black\/40,
+.grid .movie-card .fa-play,
+.grid [class*="movie-card"] .absolute:has(.fa-play) {
+    display: none !important;
+}
+
+/* Títulos de cards - blanco y más grande */
+.grid .movie-card h4,
+.grid [class*="movie-card"] h4,
+.grid .p-2 h4,
+.grid .group h4 {
+    color: white !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+}
+
+/* Header de sección Series Similares */
+section.mb-12 .p-6.border-b,
+section:has(.movie-card) .p-6 {
+    background: linear-gradient(90deg, rgba(0, 212, 255, 0.1) 0%, transparent 70%) !important;
+    border-left: 4px solid #00d4ff !important;
+    border-bottom: none !important;
+    padding: 1.5rem !important;
+    border-radius: 0 1rem 1rem 0 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Título "Series Similares" */
+section.mb-12 h3,
+section:has(.movie-card) h3 {
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    color: white !important;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+/* Icono del título */
+section.mb-12 h3 i,
+section:has(.movie-card) h3 i {
+    color: #00d4ff !important;
+    filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)) !important;
+}
+
+/* Descripción de similares */
+section.mb-12 p,
+section:has(.movie-card) p {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 1rem !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Links de género en descripción */
+section.mb-12 p a,
+section:has(.movie-card) p a,
+section .text-nova-accent {
+    display: inline-flex !important;
+    padding: 0.4rem 1rem !important;
+    margin: 0.25rem !important;
+    background: rgba(0, 212, 255, 0.1) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    border-radius: 2rem !important;
+    color: #00d4ff !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-decoration: none !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+section.mb-12 p a:hover,
+section:has(.movie-card) p a:hover,
+section .text-nova-accent:hover {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: #00d4ff !important;
+    color: white !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3) !important;
+}
+
+/* ============================================
+   TAGS DE GÉNERO (igual que películas)
+   ============================================ */
+
+/* Tags de género - celeste azul con efecto */
+.md\:flex .glass-border,
+.flex-wrap .glass-border,
+.md\:flex > .flex-1 .glass-border {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.5rem 1.25rem !important;
+    margin: 0.25rem !important;
+    background: rgba(0, 212, 255, 0.08) !important;
+    border: 1px solid rgba(0, 212, 255, 0.5) !important;
+    border-radius: 2rem !important;
+    color: #00d4ff !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-decoration: none !important;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 
+        0 0 15px rgba(0, 212, 255, 0.1),
+        inset 0 0 10px rgba(0, 212, 255, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.md\:flex .glass-border:hover,
+.flex-wrap .glass-border:hover {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: #00d4ff !important;
+    color: white !important;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.8) !important;
+    box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.3),
+        inset 0 0 15px rgba(0, 212, 255, 0.1) !important;
+}
+
+/* ============================================
+   H1 TÍTULO (igual que películas)
+   ============================================ */
+
+.md\:flex > .flex-1 h1 {
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.1 !important;
+    margin-bottom: 1.5rem !important;
+    text-shadow: 
+        0 0 20px rgba(0, 212, 255, 0.6),
+        0 0 40px rgba(0, 212, 255, 0.4),
+        0 0 60px rgba(123, 44, 191, 0.3),
+        0 0 80px rgba(123, 44, 191, 0.2),
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    background: linear-gradient(135deg, 
+        #ffffff 0%, 
+        #00d4ff 25%, 
+        #ffffff 50%, 
+        #7b2cbf 75%, 
+        #ffffff 100%) !important;
+    background-size: 200% 200% !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    animation: gradientShift 4s ease infinite !important;
+}
+
+/* Animación del gradiente del título */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
